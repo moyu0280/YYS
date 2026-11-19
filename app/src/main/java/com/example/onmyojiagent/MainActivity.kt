@@ -17,8 +17,13 @@ class MainActivity : AppCompatActivity() {
 
     private data class TaskItem(val id: String, val name: String)
 
+    // 任务列表（id 对应 assets/tasks/<id>.yaml）
+    private val taskItems = listOf(
+        TaskItem("daily_signin", "每日签到"),
+        TaskItem("soul_run", "御魂副本")
+    )
+
     private lateinit var txtLog: TextView
-    private lateinit var taskItems: List<TaskItem>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,40 +51,23 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread { txtLog.append("已停止\n") }
         }
 
-        taskItems = loadTasks()
         val spinner = findViewById<Spinner>(R.id.spinnerTask)
         spinner.adapter = ArrayAdapter(
             this, android.R.layout.simple_spinner_dropdown_item, taskItems.map { it.name }
         )
     }
 
-    /** 从 assets/tasks 读取所有任务，取 YAML 里的中文名显示 */
-    private fun loadTasks(): List<TaskItem> {
-        return try {
-            assets.list("tasks")
-                ?.filter { it.endsWith(".yaml") }
-                ?.mapNotNull { file ->
-                    val yaml = assets.open("tasks/$file").bufferedReader().readText()
-                    val task = TaskConfigParser.parse(yaml)
-                    TaskItem(file.removeSuffix(".yaml"), task.name)
-                }
-                ?: emptyList()
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
-
     private fun startSelectedTask() {
-        if (taskItems.isEmpty()) {
-            runOnUiThread { txtLog.append("没有可用任务\n") }
-            return
-        }
         val spinner = findViewById<Spinner>(R.id.spinnerTask)
         val item = taskItems[spinner.selectedItemPosition]
         Thread {
-            val yaml = assets.open("tasks/${item.id}.yaml").bufferedReader().readText()
-            val task = TaskConfigParser.parse(yaml)
-            TaskEngine.run(task)
+            try {
+                val yaml = assets.open("tasks/${item.id}.yaml").bufferedReader().readText()
+                val task = TaskConfigParser.parse(yaml)
+                TaskEngine.run(task)
+            } catch (e: Exception) {
+                runOnUiThread { txtLog.append("执行出错: ${e.message}\n") }
+            }
         }.start()
     }
 
