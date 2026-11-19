@@ -1,0 +1,10 @@
+task:
+  id: daily_signin
+  name: 每日签到
+  steps:
+    - enterPage: p_home
+    - action: { clickText: "签到" }
+    - action: { wait: 1500 }
+    - enterPage: p_signin
+    - action: { clickElement: e_signin_claim }   # 走元素词典定位"领取"
+    - action: { back: true }                     # 关闭签到页：走游戏内右上角 X / 左上角箭头

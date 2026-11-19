@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">阴阳师自动化助手</string>
+    <string name="accessibility_label">阴阳师自动化助手（无障碍）</string>
+    <string name="accessibility_desc">用于自动完成阴阳师的日常与活动，仅通过屏幕识别操作，不读取游戏内存。</string>
+</resources>

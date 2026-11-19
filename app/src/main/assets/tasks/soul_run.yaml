@@ -1,0 +1,16 @@
+task:
+  id: soul_run
+  name: 御魂副本
+  steps:
+    - enterPage: p_home
+    - action: { clickText: "探索" }
+    - action: { wait: 1500 }
+    - action: { clickText: "御魂" }
+    - enterPage: p_yuhun_select
+    - action: { clickElement: e_yuhun_layer10 }
+    - action: { clickElement: e_yuhun_start }
+    - enterPage: p_battle
+    - action: { clickElement: e_auto_battle }
+    - action: { wait: 60000 }                     # 战斗等待（正式版用 VLM 判定结算页）
+    - action: { clickElement: e_reward_close }
+    - action: { back: true }
