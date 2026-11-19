@@ -15,8 +15,10 @@ import com.example.onmyojiagent.engine.MediaProjectionCapture
 /** 主界面：授权引导 + 任务选择 + 开始/停止 + 日志 */
 class MainActivity : AppCompatActivity() {
 
-    private val tasks = listOf("daily_signin", "soul_run")
+    private data class TaskItem(val id: String, val name: String)
+
     private lateinit var txtLog: TextView
+    private lateinit var taskItems: List<TaskItem>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,15 +46,38 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread { txtLog.append("已停止\n") }
         }
 
+        taskItems = loadTasks()
         val spinner = findViewById<Spinner>(R.id.spinnerTask)
-        spinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, tasks)
+        spinner.adapter = ArrayAdapter(
+            this, android.R.layout.simple_spinner_dropdown_item, taskItems.map { it.name }
+        )
+    }
+
+    /** 从 assets/tasks 读取所有任务，取 YAML 里的中文名显示 */
+    private fun loadTasks(): List<TaskItem> {
+        return try {
+            assets.list("tasks")
+                ?.filter { it.endsWith(".yaml") }
+                ?.mapNotNull { file ->
+                    val yaml = assets.open("tasks/$file").bufferedReader().readText()
+                    val task = TaskConfigParser.parse(yaml)
+                    TaskItem(file.removeSuffix(".yaml"), task.name)
+                }
+                ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     private fun startSelectedTask() {
+        if (taskItems.isEmpty()) {
+            runOnUiThread { txtLog.append("没有可用任务\n") }
+            return
+        }
         val spinner = findViewById<Spinner>(R.id.spinnerTask)
-        val taskId = spinner.selectedItem as String
+        val item = taskItems[spinner.selectedItemPosition]
         Thread {
-            val yaml = assets.open("tasks/$taskId.yaml").bufferedReader().readText()
+            val yaml = assets.open("tasks/${item.id}.yaml").bufferedReader().readText()
             val task = TaskConfigParser.parse(yaml)
             TaskEngine.run(task)
         }.start()
