@@ -62,7 +62,7 @@ class MediaProjectionCapture : Service() {
             }, null)
         }
         virtualDisplay = projection?.createVirtualDisplay(
-            "onmyoji_capture", w, h, resources.displayMetrics.displayDensity,
+            "onmyoji_capture", w, h, resources.displayMetrics.densityDpi,
             DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
             imageReader?.surface, null, null
         )

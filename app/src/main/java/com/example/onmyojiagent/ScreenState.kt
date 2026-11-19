@@ -1,5 +1,6 @@
 package com.example.onmyojiagent
 
+import android.graphics.Rect
 import android.view.accessibility.AccessibilityNodeInfo
 
 /** 结构化屏幕：把无障碍节点树压成"可操作元素列表 + 文本指纹" */
@@ -26,13 +27,15 @@ data class ScreenState(
                 n.text?.toString()?.let { texts.add(it) }
                 n.contentDescription?.toString()?.let { texts.add(it) }
                 if (n.isClickable || n.text != null || n.viewIdResourceName != null) {
+                    val rect = Rect()
+                    n.getBoundsInScreen(rect)
                     els.add(
                         ClickableElement(
                             n.viewIdResourceName,
                             n.text?.toString(),
                             n.contentDescription?.toString(),
                             n.isClickable,
-                            n.boundsInScreen?.toString()
+                            rect.toString()
                         )
                     )
                 }

@@ -3,7 +3,7 @@ package com.example.onmyojiagent
 import org.yaml.snakeyaml.Yaml
 
 /**
- * 任务 DSL 解析器：把 assets/tasks/*.yaml 映射为 TaskConfig。
+ * 任务 DSL 解析器：把 assets/tasks 下的 yaml 文件映射为 TaskConfig。
  * 依赖：org.yaml:snakeyaml。
  */
 object TaskConfigParser {

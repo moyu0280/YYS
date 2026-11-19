@@ -1,6 +1,7 @@
 package com.example.onmyojiagent
 
 import android.graphics.Path
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.accessibility.AccessibilityNodeInfo
 
@@ -16,25 +17,26 @@ object ActionExecutor {
         service?.rootNode()
             ?.findAccessibilityNodeInfosByText(text)
             ?.firstOrNull { it.isClickable }
-            ?.performClick() == true
+            ?.performAction(AccessibilityNodeInfo.ACTION_CLICK) == true
 
     fun clickById(resourceId: String): Boolean =
         service?.rootNode()
             ?.findAccessibilityNodeInfosByViewId(resourceId)
             ?.firstOrNull { it.isClickable }
-            ?.performClick() == true
+            ?.performAction(AccessibilityNodeInfo.ACTION_CLICK) == true
 
     /** 按相对坐标点击（机型无关）：相对坐标 → 绝对像素 → dispatchGesture */
     fun clickAtRegion(relX: Float, relY: Float): Boolean {
         val s = service ?: return false
         val root = s.rootNode() ?: return false
-        val b = root.boundsInScreen
+        val b = Rect()
+        root.getBoundsInScreen(b)
         val absX = b.left + (relX * b.width()).toInt()
         val absY = b.top + (relY * b.height()).toInt()
         return dispatchTap(absX.toFloat(), absY.toFloat())
     }
 
-    /** 文本输入：对可编辑节点用 ACTION_SET_TEXT（部分游戏输入框需粘贴兜底，见 README） */
+    /** 文本输入：对可编辑节点用 ACTION_SET_TEXT（部分游戏输入框需粘贴兜底） */
     fun inputText(text: String): Boolean {
         val root = service?.rootNode() ?: return false
         val field = findEditable(root) ?: return false
@@ -55,7 +57,8 @@ object ActionExecutor {
     fun swipe(x1: Float, y1: Float, x2: Float, y2: Float, ms: Long = 300): Boolean {
         val s = service ?: return false
         val root = s.rootNode() ?: return false
-        val b = root.boundsInScreen
+        val b = Rect()
+        root.getBoundsInScreen(b)
         val path = Path().apply {
             moveTo(b.left + x1 * b.width(), b.top + y1 * b.height())
             lineTo(b.left + x2 * b.width(), b.top + y2 * b.height())
