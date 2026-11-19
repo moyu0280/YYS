@@ -7,6 +7,15 @@ android {
     namespace = "com.example.onmyojiagent"
     compileSdk = 34
 
+    signingConfigs {
+        create("stable") {
+            storeFile = file("../keystore/yys.keystore")
+            storePassword = "onmyoji123"
+            keyAlias = "yys"
+            keyPassword = "onmyoji123"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.example.onmyojiagent"
         minSdk = 26
@@ -16,12 +25,16 @@ android {
     }
 
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("stable")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("stable")
         }
     }
     compileOptions {
