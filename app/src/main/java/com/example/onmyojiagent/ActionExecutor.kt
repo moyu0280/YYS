@@ -78,7 +78,7 @@ object ActionExecutor {
         return s.dispatchGesture(g, null, null)
     }
 
-    fun wait(ms: Long) = Thread.sleep(ms)
+    fun sleep(ms: Long) = Thread.sleep(ms)
 
     /** 统一"返回/关闭"入口 —— 只点游戏内 UI，找不到返回 false（上层暂停交人工） */
     fun requestBack(): Boolean = BackRecognizer.back()

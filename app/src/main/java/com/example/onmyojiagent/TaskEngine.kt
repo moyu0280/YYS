@@ -51,7 +51,7 @@ object TaskEngine {
             is Action.ClickElement -> ElementLocator.click(a.elementId)
             is Action.ClickRegion -> ActionExecutor.clickAtRegion(a.x, a.y)
             is Action.InputText -> ActionExecutor.inputText(a.text)
-            is Action.Wait -> { ActionExecutor.wait(a.ms); true }
+            is Action.Wait -> { ActionExecutor.sleep(a.ms); true }
             is Action.Back -> ActionExecutor.requestBack()   // 走游戏内返回，绝不用系统返回
         }
     }
@@ -63,7 +63,7 @@ object TaskEngine {
         val deadline = System.currentTimeMillis() + 10_000
         while (System.currentTimeMillis() < deadline) {
             if (fp.matches(ScreenState.capture().allText)) return true
-            ActionExecutor.wait(500)
+            ActionExecutor.sleep(500)
         }
         return false
     }
